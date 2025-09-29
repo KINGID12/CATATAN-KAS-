@@ -74,6 +74,33 @@
       width: 150px; 
       height: 150px; 
     }
+
+    /* Toast Notification */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 12px;
+      position: fixed;
+      z-index: 1000;
+      right: 20px;
+      top: 20px;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.5s, top 0.5s;
+    }
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      top: 40px;
+    }
+    #toast.success { background: #28a745; }  /* hijau */
+    #toast.info { background: #007bff; }     /* biru */
+    #toast.error { background: #dc3545; }    /* merah */
   </style>
 </head>
 <body>
@@ -141,6 +168,9 @@
     <button onclick="kirimKonfirmasi()">Kirim</button>
   </div>
 
+  <!-- Toast -->
+  <div id="toast"></div>
+
   <script>
     let passwordAdmin = localStorage.getItem("passwordAdmin") || "MERDEKA321";
     let transaksi = JSON.parse(localStorage.getItem("transaksi")) || [];
@@ -172,6 +202,7 @@
       localStorage.setItem("transaksi", JSON.stringify(transaksi));
       renderTransaksi();
       renderRekap();
+      showToast(`Transaksi ${jenis} ditambahkan`, "info");
     }
 
     function renderTransaksi(){
@@ -200,13 +231,16 @@
       localStorage.setItem("transaksi", JSON.stringify(transaksi));
       renderTransaksi();
       renderRekap();
+      showToast(`Transaksi ${transaksi[i].nama} diverifikasi`, "info");
     }
 
     function hapus(i){
+      const nama = transaksi[i].nama;
       transaksi.splice(i,1);
       localStorage.setItem("transaksi", JSON.stringify(transaksi));
       renderTransaksi();
       renderRekap();
+      showToast(`Transaksi ${nama} dihapus`, "error");
     }
 
     function generateQRUmum(){
@@ -227,8 +261,23 @@
       if(!nama || !jumlah || !file){ alert("Lengkapi data!"); return; }
       const reader = new FileReader();
       reader.onload = function(e){
-        transaksi.push({ nama, jumlah, jenis:'masuk', tanggal: tgl, status:'Menunggu Verifikasi', bukti:e.target.result });
+        transaksi.push({ 
+          nama, 
+          jumlah, 
+          jenis:'masuk', 
+          tanggal: tgl, 
+          status:'Menunggu Verifikasi', 
+          bukti:e.target.result 
+        });
         localStorage.setItem("transaksi", JSON.stringify(transaksi));
+
+        // Update admin jika sedang login
+        renderTransaksi();
+        renderRekap();
+
+        // Notifikasi
+        showToast(`Konfirmasi baru dari ${nama}`, "success");
+
         alert("Konfirmasi terkirim!");
       }
       reader.readAsDataURL(file);
@@ -266,6 +315,13 @@
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Transaksi");
       XLSX.writeFile(wb, "transaksi_uangkas.xlsx");
+    }
+
+    function showToast(msg, type="info"){
+      const toast = document.getElementById("toast");
+      toast.className = `show ${type}`;
+      toast.innerText = msg;
+      setTimeout(()=>{ toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
     // jalankan saat halaman dibuka
