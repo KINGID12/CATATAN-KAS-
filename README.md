@@ -9,111 +9,28 @@
   <!-- XLSX -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <style>
-    body { 
-      font-family: "Segoe UI", sans-serif; 
-      margin: 20px; 
-      background: #f5f7fa;
-      color: #333;
-    }
+    body { font-family: "Segoe UI", sans-serif; margin: 20px; background: #f5f7fa; color: #333; }
     h2 { text-align: center; margin-bottom: 20px; }
     .hidden { display: none; }
-    .card { 
-      background: #fff; 
-      border-radius: 12px; 
-      padding: 15px; 
-      margin: 15px auto; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      max-width: 600px;
-    }
-    .summary { 
-      display: flex; 
-      gap: 10px; 
-      margin-bottom: 15px; 
-      flex-wrap: wrap;
-    }
-    .summary div { 
-      flex: 1; 
-      padding: 10px; 
-      border-radius: 8px; 
-      text-align: center; 
-      font-weight: bold;
-    }
+    .card { background: #fff; border-radius: 12px; padding: 15px; margin: 15px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px; }
+    .summary { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .summary div { flex: 1; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; }
     .masuk { background: #d4edda; color: #155724; }
     .keluar { background: #f8d7da; color: #721c24; }
     .saldo { background: #d1ecf1; color: #0c5460; }
-    a.bukti-link, button.bukti-btn { 
-      display: inline-block; 
-      margin-top: 5px; 
-      font-size: 13px; 
-      color: #007bff; 
-      text-decoration: underline; 
-      cursor: pointer;
-    }
-    button.bukti-btn {
-      background:#28a745;
-      color:#fff;
-      border:none;
-      border-radius:6px;
-      padding:5px 10px;
-      font-size:13px;
-      text-decoration:none;
-    }
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 10px; 
-      font-size: 14px;
-    }
-    table, th, td { 
-      border: 1px solid #ccc; 
-      padding: 6px; 
-      text-align: center; 
-    }
-    input, select, button {
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 100%;
-      font-size: 14px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      border: none;
-      transition: 0.3s;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    table, th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    input, select, button { margin: 5px 0; padding: 8px; border-radius: 6px; border: 1px solid #ccc; width: 100%; font-size: 14px; }
+    button { background: #007bff; color: white; cursor: pointer; border: none; transition: 0.3s; }
     button:hover { background: #0056b3; }
-    #qrUmum { 
-      margin: 10px auto; 
-      width: 150px; 
-      height: 150px; 
-    }
+    #qrUmum { margin: 10px auto; width: 150px; height: 150px; }
+    .thumb-bukti { max-height: 60px; border-radius: 4px; margin-top: 4px; cursor: pointer; }
 
     /* Toast Notification */
-    #toast {
-      visibility: hidden;
-      min-width: 250px;
-      background: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 12px;
-      position: fixed;
-      z-index: 1000;
-      right: 20px;
-      top: 20px;
-      font-size: 14px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      opacity: 0;
-      transition: opacity 0.5s, top 0.5s;
-    }
-    #toast.show {
-      visibility: visible;
-      opacity: 1;
-      top: 40px;
-    }
+    #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 6px;
+      padding: 12px; position: fixed; z-index: 1000; right: 20px; top: 20px; font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.5s, top 0.5s; }
+    #toast.show { visibility: visible; opacity: 1; top: 40px; }
     #toast.success { background: #28a745; }
     #toast.info { background: #007bff; }
     #toast.error { background: #dc3545; }
@@ -196,13 +113,9 @@
       if(pw === passwordAdmin){
         document.getElementById("loginPanel").classList.add("hidden");
         document.getElementById("adminPanel").classList.remove("hidden");
-        renderTransaksi();
-        renderRekap();
-      } else {
-        alert("Password salah!");
-      }
+        renderTransaksi(); renderRekap();
+      } else { alert("Password salah!"); }
     }
-
     function logoutAdmin(){
       document.getElementById("adminPanel").classList.add("hidden");
       document.getElementById("loginPanel").classList.remove("hidden");
@@ -216,8 +129,7 @@
       if(!nama || !jumlah){ alert("Lengkapi data!"); return; }
       transaksi.push({ nama, jumlah, jenis, tanggal: tgl, status:(jenis==='masuk'?'Menunggu Verifikasi':'-') });
       localStorage.setItem("transaksi", JSON.stringify(transaksi));
-      renderTransaksi();
-      renderRekap();
+      renderTransaksi(); renderRekap();
       showToast(`Transaksi ${jenis} ditambahkan`, "info");
     }
 
@@ -226,13 +138,12 @@
       div.innerHTML = "";
       let totalMasuk=0, totalKeluar=0;
       transaksi.forEach((t,i)=>{
-        if(t.jenis==='masuk') totalMasuk+=t.jumlah;
-        else totalKeluar+=t.jumlah;
+        if(t.jenis==='masuk') totalMasuk+=t.jumlah; else totalKeluar+=t.jumlah;
         let html = `<div style="margin-bottom:8px; text-align:left;">
           <b>${t.nama}</b> - Rp${t.jumlah} (${t.jenis})<br>
           Tanggal: ${t.tanggal}<br>
           Status: <i>${t.status}</i>
-          ${t.bukti?`<br><button class="bukti-btn" onclick="window.open('${t.bukti}','_blank')">📎 Buka Bukti Ini</button>`:''}
+          ${t.bukti?`<br><a href="${t.bukti}" target="_blank"><img src="${t.bukti}" class="thumb-bukti"></a>`:''}
           ${t.status!=='Lunas' && t.jenis==='masuk'?`<br><button onclick="verifikasi(${i})">Verifikasi</button>`:''}
           <button style="background:#dc3545; margin-left:5px;" onclick="hapus(${i})">Hapus</button>
         </div><hr>`;
@@ -246,17 +157,14 @@
     function verifikasi(i){
       transaksi[i].status = "Lunas";
       localStorage.setItem("transaksi", JSON.stringify(transaksi));
-      renderTransaksi();
-      renderRekap();
+      renderTransaksi(); renderRekap();
       showToast(`Transaksi ${transaksi[i].nama} diverifikasi`, "info");
     }
-
     function hapus(i){
       const nama = transaksi[i].nama;
       transaksi.splice(i,1);
       localStorage.setItem("transaksi", JSON.stringify(transaksi));
-      renderTransaksi();
-      renderRekap();
+      renderTransaksi(); renderRekap();
       showToast(`Transaksi ${nama} dihapus`, "error");
     }
 
@@ -265,8 +173,7 @@
       container.innerHTML = "";
       new QRCode(container, {
         text: window.location.href.split("#")[0] + "#konfirmasi",
-        width: 150,
-        height: 150
+        width: 150, height: 150
       });
     }
 
@@ -278,18 +185,9 @@
       if(!nama || !jumlah || !file){ alert("Lengkapi data!"); return; }
       const reader = new FileReader();
       reader.onload = function(e){
-        transaksi.push({ 
-          nama, 
-          jumlah, 
-          jenis:'masuk', 
-          tanggal: tgl, 
-          status:'Menunggu Verifikasi', 
-          bukti:e.target.result 
-        });
+        transaksi.push({ nama, jumlah, jenis:'masuk', tanggal: tgl, status:'Menunggu Verifikasi', bukti:e.target.result });
         localStorage.setItem("transaksi", JSON.stringify(transaksi));
-
-        renderTransaksi();
-        renderRekap();
+        renderTransaksi(); renderRekap();
         showToast(`Konfirmasi baru dari ${nama}`, "success");
         alert("Konfirmasi terkirim!");
       }
@@ -309,8 +207,7 @@
       for(const b in rekap){
         html += `<tr><td>${b}</td><td>Rp${rekap[b].masuk}</td><td>Rp${rekap[b].keluar}</td><td>Rp${rekap[b].masuk - rekap[b].keluar}</td></tr>`;
       }
-      html += "</table>";
-      div.innerHTML = html;
+      html += "</table>"; div.innerHTML = html;
     }
 
     function ubahPassword(){
@@ -318,8 +215,7 @@
       const newPw = document.getElementById("newPw").value;
       if(oldPw !== passwordAdmin){ alert("Password lama salah!"); return; }
       if(!newPw){ alert("Password baru tidak boleh kosong!"); return; }
-      passwordAdmin = newPw;
-      localStorage.setItem("passwordAdmin", newPw);
+      passwordAdmin = newPw; localStorage.setItem("passwordAdmin", newPw);
       alert("Password berhasil diubah!");
     }
 
@@ -332,8 +228,7 @@
 
     function showToast(msg, type="info"){
       const toast = document.getElementById("toast");
-      toast.className = `show ${type}`;
-      toast.innerText = msg;
+      toast.className = `show ${type}`; toast.innerText = msg;
       setTimeout(()=>{ toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
@@ -348,8 +243,7 @@
     window.addEventListener("storage", function(e){
       if(e.key === "transaksi"){
         transaksi = JSON.parse(localStorage.getItem("transaksi")) || [];
-        renderTransaksi();
-        renderRekap();
+        renderTransaksi(); renderRekap();
         showToast("📢 Ada konfirmasi baru masuk!", "success");
       }
     });
