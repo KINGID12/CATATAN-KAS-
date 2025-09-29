@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -41,13 +41,22 @@
     .masuk { background: #d4edda; color: #155724; }
     .keluar { background: #f8d7da; color: #721c24; }
     .saldo { background: #d1ecf1; color: #0c5460; }
-    a.bukti-link { 
+    a.bukti-link, button.bukti-btn { 
       display: inline-block; 
       margin-top: 5px; 
       font-size: 13px; 
       color: #007bff; 
       text-decoration: underline; 
       cursor: pointer;
+    }
+    button.bukti-btn {
+      background:#28a745;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      padding:5px 10px;
+      font-size:13px;
+      text-decoration:none;
     }
     table { 
       width: 100%; 
@@ -105,9 +114,9 @@
       opacity: 1;
       top: 40px;
     }
-    #toast.success { background: #28a745; }  /* hijau */
-    #toast.info { background: #007bff; }     /* biru */
-    #toast.error { background: #dc3545; }    /* merah */
+    #toast.success { background: #28a745; }
+    #toast.info { background: #007bff; }
+    #toast.error { background: #dc3545; }
   </style>
 </head>
 <body>
@@ -223,7 +232,7 @@
           <b>${t.nama}</b> - Rp${t.jumlah} (${t.jenis})<br>
           Tanggal: ${t.tanggal}<br>
           Status: <i>${t.status}</i>
-          ${t.bukti?`<br><a href="${t.bukti}" target="_blank" class="bukti-link">📎 Lihat Bukti</a>`:''}
+          ${t.bukti?`<br><button class="bukti-btn" onclick="window.open('${t.bukti}','_blank')">📎 Buka Bukti Ini</button>`:''}
           ${t.status!=='Lunas' && t.jenis==='masuk'?`<br><button onclick="verifikasi(${i})">Verifikasi</button>`:''}
           <button style="background:#dc3545; margin-left:5px;" onclick="hapus(${i})">Hapus</button>
         </div><hr>`;
@@ -328,7 +337,6 @@
       setTimeout(()=>{ toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
-    // jalankan saat halaman dibuka
     window.onload = function(){
       generateQRUmum();
       if(window.location.hash==="#konfirmasi"){
@@ -337,7 +345,6 @@
       }
     }
 
-    // ✅ Auto sync peserta → admin tanpa reload
     window.addEventListener("storage", function(e){
       if(e.key === "transaksi"){
         transaksi = JSON.parse(localStorage.getItem("transaksi")) || [];
