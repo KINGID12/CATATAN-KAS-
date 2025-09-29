@@ -41,7 +41,14 @@
     .masuk { background: #d4edda; color: #155724; }
     .keluar { background: #f8d7da; color: #721c24; }
     .saldo { background: #d1ecf1; color: #0c5460; }
-    img { max-width: 120px; margin-top: 5px; border-radius: 6px; }
+    a.bukti-link { 
+      display: inline-block; 
+      margin-top: 5px; 
+      font-size: 13px; 
+      color: #007bff; 
+      text-decoration: underline; 
+      cursor: pointer;
+    }
     table { 
       width: 100%; 
       border-collapse: collapse; 
@@ -213,9 +220,10 @@
         if(t.jenis==='masuk') totalMasuk+=t.jumlah;
         else totalKeluar+=t.jumlah;
         let html = `<div style="margin-bottom:8px; text-align:left;">
-          <b>${t.nama}</b> - Rp${t.jumlah} (${t.jenis}) - ${t.tanggal}<br>
+          <b>${t.nama}</b> - Rp${t.jumlah} (${t.jenis})<br>
+          Tanggal: ${t.tanggal}<br>
           Status: <i>${t.status}</i>
-          ${t.bukti?`<br><img src="${t.bukti}" alt="Bukti">`:''}
+          ${t.bukti?`<br><a href="${t.bukti}" target="_blank" class="bukti-link">📎 Lihat Bukti</a>`:''}
           ${t.status!=='Lunas' && t.jenis==='masuk'?`<br><button onclick="verifikasi(${i})">Verifikasi</button>`:''}
           <button style="background:#dc3545; margin-left:5px;" onclick="hapus(${i})">Hapus</button>
         </div><hr>`;
@@ -271,13 +279,9 @@
         });
         localStorage.setItem("transaksi", JSON.stringify(transaksi));
 
-        // Update admin jika sedang login
         renderTransaksi();
         renderRekap();
-
-        // Notifikasi
         showToast(`Konfirmasi baru dari ${nama}`, "success");
-
         alert("Konfirmasi terkirim!");
       }
       reader.readAsDataURL(file);
@@ -332,6 +336,16 @@
         document.getElementById("pesertaForm").classList.remove("hidden");
       }
     }
+
+    // ✅ Auto sync peserta → admin tanpa reload
+    window.addEventListener("storage", function(e){
+      if(e.key === "transaksi"){
+        transaksi = JSON.parse(localStorage.getItem("transaksi")) || [];
+        renderTransaksi();
+        renderRekap();
+        showToast("📢 Ada konfirmasi baru masuk!", "success");
+      }
+    });
   </script>
 </body>
 </html>
